@@ -2,11 +2,14 @@ package com.indeema.circularlistview;
 
 import android.app.Activity;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 
 import com.indeema.circularlistview.adapter.MenuItemsAdapter;
 import com.indeema.circularlistview.entity.MenuItem;
@@ -17,11 +20,13 @@ import com.indeema.circularlistview.widget.CircularListViewListener;
  * Created by Kostiantyn Bushko on 7/13/17.
  */
 
-public class MenuActivity extends Activity {
+public class MenuActivity extends Activity implements MenuItemsAdapter.MenuItemAdapterListener {
 
     private static final String TAG = MenuActivity.class.getSimpleName();
 
     private CircularListView mCircularListView;
+
+    private RelativeLayout mRoot;
 
     private boolean mIsAdapterDirty = true;
 
@@ -45,18 +50,29 @@ public class MenuActivity extends Activity {
         mCircularListView = (CircularListView) findViewById(R.id.circularListView);
 
 
-        MenuItemsAdapter listAdapter = new MenuItemsAdapter(this, R.layout.menu_item_layout);
-        for (int i = 0; i < drawableResources.length; i++) {
-            MenuItem menuItem = new MenuItem();
-            menuItem.setImage(BitmapFactory.decodeResource(getResources(), drawableResources[i]));
-            menuItem.setTitle("Item : " + Integer.toString(i));
-            listAdapter.add(menuItem);
-        }
+        mRoot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mRoot.getViewTreeObserver().removeOnPreDrawListener(this);
+                Display display = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int viewHeight = mRoot.getHeight() / 4;
+                MenuItemsAdapter listAdapter = new MenuItemsAdapter(MenuActivity.this, R.layout.menu_item_layout, viewHeight, MenuActivity.this);
+                for (int i = 0; i < 5; i++) {
+                    MenuItem menuItem = new MenuItem();
+                    menuItem.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_help_black_48dp));
+                    menuItem.setTitle("Item : " + Integer.toString(i));
+                    listAdapter.add(menuItem);
+                }
 
-        Display display = getWindowManager().getDefaultDisplay();
-        mCircularListView.setRadius(Math.min(300, display.getWidth() / 2));
-        mCircularListView.setAdapter(listAdapter);
-        mCircularListView.scrollFirstItemToCenter();
+                mCircularListView.setRadius(Math.min(300, display.getWidth() / 2));
+                mCircularListView.setAdapter(listAdapter);
+                mCircularListView.scrollFirstItemToCenter();
+
+                return false;
+            }
+        });
 
         mCircularListView.setCircularListViewListener(new CircularListViewListener() {
             @Override
@@ -74,21 +90,10 @@ public class MenuActivity extends Activity {
     }
 
     void refreshCircular() {
-//        if (mIsAdapterDirty) {
-//            mCircularListView.scrollFirstItemToCenter();
-//            mIsAdapterDirty = false;
-//        }
-//
-//        TextView centerView = (TextView) mCircularListView.getCentralChild();
-//
-//        if (centerView != null) {
-//            centerView.setTextColor(getResources().getColor(R.color.center_text));
-//        }
-//        for (int i = 0; i < mCircularListView.getChildCount(); i++) {
-//            TextView view = (TextView) mCircularListView.getChildAt(i);
-//            if (view != null && view != centerView) {
-//                view.setTextColor(getResources().getColor(R.color.default_text));
-//            }
-//        }
+    }
+
+    @Override
+    public void onItemClick(int position) {
+
     }
 }

@@ -19,11 +19,15 @@ import java.util.List;
 /**
  * Created by Kostiantyn Bushko on 7/12/17.
  */
-
 public class MenuItemsAdapter extends ArrayAdapter<MenuItem> {
 
-    public MenuItemsAdapter(@NonNull Context context, @LayoutRes int resource) {
+    private MenuItemAdapterListener mListener;
+    private int mViewHeight;
+
+    public MenuItemsAdapter(@NonNull Context context, @LayoutRes int resource, int viewHeight, MenuItemAdapterListener listener) {
         super(context, resource);
+        mViewHeight = viewHeight;
+        this.mListener = listener;
     }
 
     public MenuItemsAdapter(@NonNull Context context, @LayoutRes int resource, List<MenuItem> items) {
@@ -32,22 +36,40 @@ public class MenuItemsAdapter extends ArrayAdapter<MenuItem> {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         if (view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
             view = layoutInflater.inflate(R.layout.menu_item_layout, null);
+            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    mViewHeight));
         }
 
         MenuItem menuItem = getItem(position);
 
         if (menuItem != null) {
             ImageView imageView = (ImageView)view.findViewById(R.id.iv_icon);
-            TextView subTitle = (TextView) view.findViewById(R.id.tv_sub_title);
+            TextView textView = (TextView)view.findViewById(R.id.text_tv);
+            textView.setText(menuItem.getTitle());
             imageView.setImageBitmap(menuItem.getImage());
-            subTitle.setText(menuItem.getTitle());
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onItemClick(position);
+                }
+            });
         }
 
         return view;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
+    }
+
+    public interface MenuItemAdapterListener {
+
+        void onItemClick(int position);
     }
 }
