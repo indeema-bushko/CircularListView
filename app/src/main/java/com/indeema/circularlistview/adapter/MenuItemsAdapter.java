@@ -22,9 +22,6 @@ import java.util.List;
 
 public class MenuItemsAdapter extends ArrayAdapter<MenuItem> {
 
-
-    private int mMaxDisplayRow = 4;
-
     public MenuItemsAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, resource);
     }
@@ -53,16 +50,4 @@ public class MenuItemsAdapter extends ArrayAdapter<MenuItem> {
 
         return view;
     }
-
-    public void setMaxDisplayRow(int mMaxDisplayRow) {
-        this.mMaxDisplayRow = mMaxDisplayRow;
-    }
-
-//    @Override
-//    public int getCount() {
-////        if (super.getCount() == 0) {
-////            return 0;
-////        }
-//        return 4;
-//    }
 }

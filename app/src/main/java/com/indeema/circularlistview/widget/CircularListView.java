@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -256,28 +257,28 @@ public class CircularListView extends ListView implements AbsListView.OnScrollLi
                     double angle = Math.asin(y / yRadius);
                     double x = xRadius * Math.cos(angle);
 
+                    Log.d(TAG, i + ") onScroll : angle -> " + angle + ", x -> " + x);
                     if (mCircularListViewContentAlignment == CircularListViewContentAlignment.Left) {
                         x -= xRadius;
                     } else {
                         x = xRadius / 2 - x;
                     }
-                    itemView.scrollTo((int) x, 0);
+                    itemView.setX(-(getWidth() * 0.25f));
+                    itemView.scrollTo((int)x, 0);
+                }
+            }
+        } else {
+            for (int i = 0; i < visibleItemCount; i++) {
+                itemView = this.getChildAt(i);
+                if (itemView != null) {
+                    itemView.scrollTo(0, 0);
                 }
             }
         }
 
-//        else {
-//            for (int i = 0; i < visibleItemCount; i++) {
-//                itemView = this.getChildAt(i);
-//                if (itemView != null) {
-//                    itemView.scrollTo(0, 0);
-//                }
-//            }
-//        }
-//
-//        if (mCircularListViewListener != null) {
-//            mCircularListViewListener.onCircularLayoutFinished(this, firstVisibleItem, visibleItemCount, totalItemCount);
-//        }
+        if (mCircularListViewListener != null) {
+            mCircularListViewListener.onCircularLayoutFinished(this, firstVisibleItem, visibleItemCount, totalItemCount);
+        }
     }
 
     class InfiniteListAdapter implements ListAdapter {
